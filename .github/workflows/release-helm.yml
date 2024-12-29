@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'temp/**'
 
@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: 'src'
-          ref: 'master'
+          ref: 'main'
           fetch-depth: 0
 
       - name: Checkout
