@@ -2,6 +2,22 @@ apiVersion: v1
 entries:
   registry-ui:
   - apiVersion: v2
+    appVersion: 1.0.1
+    created: "2024-12-29T23:52:13.363093194Z"
+    dependencies:
+    - import-values:
+      - defaults
+      name: helmet
+      repository: https://charts.companyinfo.dev
+      version: 0.11.0
+    description: A Helm chart for docker registry UI
+    digest: 83a90ca15700aeec3fc0461db87f32a6781bf33d89cb7ebb5b032003d0fd09bb
+    name: registry-ui
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/Atrosh/helm-repository/gh-pages/helm/registry-ui-1.0.1.tgz
+    version: 1.0.1
+  - apiVersion: v2
     appVersion: 1.0.0
     created: "2024-12-29T23:01:10.099987067Z"
     dependencies:
@@ -17,4 +33,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/Atrosh/helm-repository/gh-pages/helm/registry-ui-1.0.0.tgz
     version: 1.0.0
-generated: "2024-12-29T23:01:10.097984559Z"
+generated: "2024-12-29T23:52:13.360928809Z"
