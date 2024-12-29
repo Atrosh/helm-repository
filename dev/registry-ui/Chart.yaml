@@ -2,8 +2,8 @@ apiVersion: v2
 name: registry-ui
 description: A Helm chart for docker registry UI
 type: application
-version: 1.0.0
-appVersion: "1.0.0"
+version: 1.0.1
+appVersion: "1.0.1"
 dependencies:
   - name: helmet
     version: 0.11.0

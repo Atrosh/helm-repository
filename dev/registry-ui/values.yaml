@@ -2,11 +2,21 @@ image:
   repository: "joxit/docker-registry-ui"
   pullPolicy: IfNotPresent
   tag: "2.5.7"
+ports:
+  - name: http
+    containerPort: 80
+    protocol: TCP
+envVars:
+  SINGLE_REGISTRY: "true"
+  REGISTRY_TITLE: "Docker Registry UI"
+  DELETE_IMAGES: "true"
 livenessProbe:
+  enabled: true
   httpGet:
     path: /
     port: http
 readinessProbe:
+  enabled: true
   httpGet:
     path: /
     port: http
