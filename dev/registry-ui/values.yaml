@@ -1,0 +1,12 @@
+image:
+  repository: "joxit/docker-registry-ui"
+  pullPolicy: IfNotPresent
+  tag: "2.5.7"
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
