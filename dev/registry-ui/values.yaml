@@ -6,10 +6,6 @@ ports:
   - name: http
     containerPort: 80
     protocol: TCP
-envVars:
-  SINGLE_REGISTRY: "true"
-  REGISTRY_TITLE: "Docker Registry UI"
-  DELETE_IMAGES: "true"
 livenessProbe:
   enabled: true
   httpGet:
