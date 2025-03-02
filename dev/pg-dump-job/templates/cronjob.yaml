@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "pg-dump-job.name" $ }}-db-backup
+  labels:
+    {{- include "pg-dump-job.labels" $ | nindent 4 }}
+spec:
+  schedule: {{ .Values.schedule | quote}}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          restartPolicy: Never
+          volumes:
+            - name: backup
+              emptyDir:
+                sizeLimit:  {{ .Values.sizeLimit | default 10Gi }}
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: backup-runner
+              image: {{ .Values.image }}
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
+              env:
+                {{- range $key, $value := .Values.envSecrets }}
+                - name: {{ $key }}
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ $value.secret }}
+                      key: {{ $value.key }}
+                {{- end }}
+                {{- range $key, $value := .Values.envs }}
+                - name: {{ $key }}
+                  value: {{ $value }}
+                {{- end }}
+              command:
+                - /bin/bash
+                - -c
+              args:
+                - |
+              {{ include "backup.script" . | indent 16 }}

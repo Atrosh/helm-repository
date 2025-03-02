@@ -1,0 +1,14 @@
+# Default values for pg-dump-job.
+image: ""
+
+imagePullSecrets:
+  - name: regcred
+
+nameOverride: ""
+fullnameOverride: ""
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
