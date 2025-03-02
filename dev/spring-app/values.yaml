@@ -55,9 +55,17 @@ service:
   type: ClusterIP
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
   port: 8080
+  additionalPorts: []
+#    - name: jbrnr
+#      containerPort: 8090
+#      protocol: TCP
 
 envs:
   logging.structured.format.console: 'logstash'
+envSecrets: {}
+#  spring.datasource.password:
+#    secret: postgres-sa
+#    key: password
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:

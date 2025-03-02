@@ -44,6 +44,11 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+            {{- range .Values.service.additionalPorts }}
+            - name: {{ .name }}
+              containerPort: {{ .port }}
+              protocol: {{ .protocol | default 'TCP' | quote}}
+            {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
@@ -60,6 +65,17 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          env:
+            {{- range $key, $value := .Values.envSecrets }}
+            - name: {{ $key }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.secret }}
+                  key: {{ $value.key }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "spring-app.fullname" . }}
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
