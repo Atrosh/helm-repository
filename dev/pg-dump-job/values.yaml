@@ -8,6 +8,9 @@ imagePullSecrets:
 nameOverride: ""
 fullnameOverride: ""
 
+envs: {}
+envSecrets: {}
+
 nodeSelector: {}
 
 tolerations: []
