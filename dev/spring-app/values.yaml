@@ -67,6 +67,9 @@ envSecrets: {}
 #    secret: postgres-sa
 #    key: password
 
+pg-dump-job:
+  enabled: false
+
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
   enabled: false
