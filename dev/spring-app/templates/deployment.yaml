@@ -47,7 +47,7 @@ spec:
             {{- range .Values.service.additionalPorts }}
             - name: {{ .name }}
               containerPort: {{ .port }}
-              protocol: {{ .protocol | default 'TCP' | quote}}
+              protocol: {{ .protocol | default "TCP" }}
             {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:

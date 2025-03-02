@@ -5,4 +5,4 @@ data:
   {{- end }}
 kind: ConfigMap
 metadata:
-  name: {{ include "finapp-api.fullname" . }}
+  name: {{ include "spring-app.fullname" . }}
