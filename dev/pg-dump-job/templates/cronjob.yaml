@@ -1,3 +1,4 @@
+{{- if .Values.enabled }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -58,3 +59,4 @@ spec:
               args:
                 - |
               {{ include "backup.script" . | indent 16 }}
+{{- end }}

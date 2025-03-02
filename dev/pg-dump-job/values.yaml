@@ -1,4 +1,5 @@
 # Default values for pg-dump-job.
+enabled: false
 image: ""
 
 imagePullSecrets:
