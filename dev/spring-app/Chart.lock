@@ -1,6 +1,6 @@
 dependencies:
 - name: pg-dump-job
   repository: https://raw.githubusercontent.com/Atrosh/helm-repository/gh-pages
-  version: 0.2.3
-digest: sha256:c10cc81617938059d5bae21fd59a55e4e674e6bba6886a9132b8488a38d988fa
-generated: "2025-03-03T01:14:37.256715+01:00"
+  version: 0.2.4
+digest: sha256:dbde3dd0b567d5f36aed1e352fecdfa6abd58cb37c2b2ad7cdbfefb178a3d632
+generated: "2025-03-03T01:44:02.929949+01:00"
