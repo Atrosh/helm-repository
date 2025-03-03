@@ -17,7 +17,7 @@ spec:
           volumes:
             - name: backup
               emptyDir:
-                sizeLimit:  {{ .Values.sizeLimit | default 10Gi }}
+                sizeLimit:  {{ .Values.sizeLimit | default "10Gi" }}
           {{- with .Values.imagePullSecrets }}
           imagePullSecrets:
             {{- toYaml . | nindent 12 }}
