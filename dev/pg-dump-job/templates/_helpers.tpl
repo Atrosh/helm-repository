@@ -49,14 +49,3 @@ Selector labels
 app.kubernetes.io/name: {{ include "pg-dump-job.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "pg-dump-job.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "pg-dump-job.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}

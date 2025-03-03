@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ include "pg-dump-job.name" $ }}-db-backup
+  name: {{ include "pg-dump-job.fullname" $ }}-db-backup
   labels:
     {{- include "pg-dump-job.labels" $ | nindent 4 }}
 spec:
@@ -58,5 +58,5 @@ spec:
                 - -c
               args:
                 - |
-              {{ include "backup.script" . | indent 16 }}
+              {{- include "backup.script" . | indent 18 }}
 {{- end }}
