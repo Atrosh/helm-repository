@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ include "pg-dump-job.fullname" $ }}-db-backup
+  name: {{ include "pg-dump-job.fullname" $ }}-cron
   labels:
     {{- include "pg-dump-job.labels" $ | nindent 4 }}
 spec:
@@ -42,16 +42,11 @@ spec:
                 - name: backup
                   mountPath: /backup
               env:
-                {{- range $key, $value := .Values.envSecrets }}
-                - name: {{ $key }}
-                  valueFrom:
-                    secretKeyRef:
-                      name: {{ $value.secret }}
-                      key: {{ $value.key }}
+                {{- with .Values.envSecrets }}
+                  {{- toYaml . | nindent 16 }}
                 {{- end }}
-                {{- range $key, $value := .Values.envs }}
-                - name: {{ $key }}
-                  value: {{ $value }}
+                {{- with .Values.envs }}
+                  {{- toYaml . | nindent 16 }}
                 {{- end }}
               command:
                 - /bin/bash
