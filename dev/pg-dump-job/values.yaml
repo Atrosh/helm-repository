@@ -1,15 +1,42 @@
-# Default values for pg-dump-job.
-enabled: false
-image: ""
+enabled: true
+image: "bitnami/postgresql"
+
+schedule: "0 0 * * *"
+
+sizeLimit: ""
+backupDirectory: "/backup"
+
+db:
+  host: ""
+  name: "postgres"
+  user: "postgres"
+  password: {}
+#  password:
+#    valueFrom:
+#      secretKeyRef:
+#        name: postgres
+#        key: password
+upload:
+  s3:
+    enabled: true
+    image: "minio/mc"
+    url: ""
+    bucket: "db-backups"
+    accessKey: {}
+    secretKey: {}
+    targetLocation: ""
+
+  sharepoint:
+    enabled: false
+    image: ""
+    tenantId: ""
+    driveId: ""
+    clientId: {}
+    clientSecret: {}
+    targetLocation: ""
 
 imagePullSecrets:
   - name: regcred
-
-nameOverride: ""
-fullnameOverride: ""
-
-envs: {}
-envSecrets: {}
 
 nodeSelector: {}
 

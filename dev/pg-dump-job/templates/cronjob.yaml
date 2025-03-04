@@ -17,7 +17,7 @@ spec:
           volumes:
             - name: backup
               emptyDir:
-                sizeLimit:  {{ .Values.sizeLimit | default "10Gi" }}
+                sizeLimit: {{ .Values.sizeLimit | default "10Gi" }}
           {{- with .Values.imagePullSecrets }}
           imagePullSecrets:
             {{- toYaml . | nindent 12 }}
@@ -34,19 +34,25 @@ spec:
           tolerations:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          containers:
+          initContainers:
             - name: backup-runner
               image: {{ .Values.image }}
               imagePullPolicy: IfNotPresent
               volumeMounts:
                 - name: backup
-                  mountPath: /backup
+                  mountPath: {{ .Values.backupDirectory }}
               env:
-                {{- with .Values.envSecrets }}
-                  {{- toYaml . | nindent 16 }}
-                {{- end }}
-                {{- with .Values.envs }}
-                  {{- toYaml . | nindent 16 }}
+                - name: BACKUP_DIR
+                  value: {{ .Values.backupDirectory }}
+                - name: DB_NAME
+                  value: {{ .Values.db.name }}
+                - name: DB_USER
+                  value: {{ .Values.db.user }}
+                - name: DB_HOST
+                  value: {{ .Values.db.host }}
+                - name: PGPASSWORD
+                {{- with .Values.db.password }}
+                  {{- toYaml . | nindent 18 }}
                 {{- end }}
               command:
                 - /bin/bash
@@ -54,4 +60,85 @@ spec:
               args:
                 - |
               {{- include "backup.script" . | indent 18 }}
+            {{- if .Values.upload.s3.enabled }}
+            - name: s3-uploader
+              image: {{ .Values.upload.s3.image }}
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - name: backup
+                  mountPath: {{ .Values.backupDirectory }}
+              env:
+                - name: BACKUP_DIR
+                  value: {{ .Values.backupDirectory }}
+                - name: MINIO_URL
+                  value: {{ .Values.upload.s3.url }}
+                - name: MINIO_BUCKET
+                  value: {{ .Values.upload.s3.bucket }}
+                - name: TARGET_LOCATION
+                  value: {{ .Values.upload.s3.targetLocation }}
+                - name: MINIO_ACCESS_KEY
+                {{- with .Values.upload.s3.accessKey }}
+                  {{- toYaml . | nindent 18 }}
+                {{- end }}
+                - name: MINIO_SECRET_KEY
+                {{- with .Values.upload.s3.secretKey }}
+                  {{- toYaml . | nindent 18 }}
+                {{- end }}
+              command:
+                - /bin/bash
+                - -c
+              args:
+                - |
+              {{- include "backup.upload.s3" . | indent 18 }}
+            {{- end }}
+            {{- if .Values.upload.sharepoint.enabled }}
+            - name: sharepoint-uploader
+              image: {{ .Values.upload.sharepoint.image }}
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - name: backup
+                  mountPath: {{ .Values.backupDirectory }}
+              env:
+                - name: BACKUP_DIR
+                  value: {{ .Values.backupDirectory }}
+                - name: MS_TENANT_ID
+                  value: {{ .Values.upload.sharepoint.tenantId }}
+                - name: SHAREPOINT_DRIVE_ID
+                  value: {{ .Values.upload.sharepoint.driveId }}
+                - name: SHAREPOINT_FOLDER_PATH
+                  value: {{ .Values.upload.sharepoint.targetLocation }}
+                - name: MS_CLIENT_ID
+                {{- with .Values.upload.sharepoint.clientId }}
+                  {{- toYaml . | nindent 18 }}
+                {{- end }}
+                - name: MS_CLIENT_SECRET
+                {{- with .Values.upload.sharepoint.clientSecret }}
+                  {{- toYaml . | nindent 18 }}
+                {{- end }}
+              command:
+                - /bin/bash
+                - -c
+              args:
+                - |
+              {{- include "backup.upload.sharepoint" . | indent 18 }}
+            {{- end }}
+          containers:
+            - name: backup-finalizer
+              image: {{ .Values.image }}
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - name: backup
+                  mountPath: {{ .Values.backupDirectory }}
+              command:
+                - /bin/bash
+                - -c
+              env:
+                - name: BACKUP_DIR
+                  value: {{ .Values.backupDirectory }}
+              args:
+                - |
+                  cd ${BACKUP_DIR}
+                  BACKUP_FILE=$(ls -tp | grep -v / | head -n 1)
+                  rm -f "${BACKUP_FILE}"
+                  echo "Backup and upload completed successfully!"
 {{- end }}
