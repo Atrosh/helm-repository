@@ -75,7 +75,7 @@ spec:
                 - name: MINIO_BUCKET
                   value: {{ .Values.upload.s3.bucket }}
                 - name: TARGET_LOCATION
-                  value: {{ .Values.upload.s3.targetLocation }}
+                  value: {{ trimSuffix "/" .Values.upload.s3.targetLocation }}
                 - name: MINIO_ACCESS_KEY
                 {{- with .Values.upload.s3.accessKey }}
                   {{- toYaml . | nindent 18 }}
@@ -89,6 +89,7 @@ spec:
                 - -c
               args:
                 - |
+              {{- include "backup.upload.skip" .Values.upload.s3 | indent 18 }}
               {{- include "backup.upload.s3" . | indent 18 }}
             {{- end }}
             {{- if .Values.upload.sharepoint.enabled }}
@@ -120,6 +121,7 @@ spec:
                 - -c
               args:
                 - |
+              {{- include "backup.upload.skip" .Values.upload.sharepoint | indent 18 }}
               {{- include "backup.upload.sharepoint" . | indent 18 }}
             {{- end }}
           containers:

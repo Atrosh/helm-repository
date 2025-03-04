@@ -19,12 +19,14 @@ db:
 upload:
   s3:
     enabled: true
-    image: "minio/mc"
+    image: "bitnami/minio-client"
     url: ""
     bucket: "db-backups"
     accessKey: {}
     secretKey: {}
     targetLocation: ""
+    # With "1 5 7" value backup will run Mon, Fri, Sun
+    backupDays: ""
 
   sharepoint:
     enabled: false
@@ -34,6 +36,7 @@ upload:
     clientId: {}
     clientSecret: {}
     targetLocation: ""
+    backupDays: ""
 
 imagePullSecrets:
   - name: regcred
