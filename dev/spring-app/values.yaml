@@ -75,8 +75,8 @@ pg-dump-job:
 ingress:
   enabled: false
   className: nginx
-  annotations:
-    cert-manager.io/issuer: "cert-manager-issuer"
+#  annotations:
+#    cert-manager.io/issuer: "cert-manager-issuer"
   hosts: []
 #    - host: chart-example.local
 #      paths:
