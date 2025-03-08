@@ -57,16 +57,27 @@ while [ ${OFFSET} -lt ${FILE_SIZE} ]; do
 
   echo "Uploading bytes ${OFFSET}-${CHUNK_END}/${FILE_SIZE}"
 
-  RESPONSE=$(curl -s -X PUT -H "Authorization: Bearer ${ACCESS_TOKEN}" \
-    -H "Content-Length: ${CHUNK_LENGTH}" \
-    -H "Content-Range: ${CHUNK_RANGE}" \
-    --data-binary @<(dd if="${BACKUP_FILE}" bs=1 skip=${OFFSET} count=${CHUNK_LENGTH} 2>/dev/null) \
-    "${UPLOAD_URL}")
+  RETRIES=3
+  while [ $RETRIES -gt 0 ]; do
+    RESPONSE=$(curl -s -X PUT -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+      -H "Content-Length: ${CHUNK_LENGTH}" \
+      -H "Content-Range: ${CHUNK_RANGE}" \
+      --data-binary @<(dd if="${BACKUP_FILE}" bs=1 skip=${OFFSET} count=${CHUNK_LENGTH} 2>/dev/null) \
+      "${UPLOAD_URL}")
 
-  if [ $? -ne 0 ]; then
-    echo "Failed to upload chunk ${OFFSET}-${CHUNK_END}"
-    exit 1
-  fi
+    if [ $? -eq 0 ]; then
+      break
+    fi
+
+    RETRIES=$((RETRIES - 1))
+    if [ $RETRIES -gt 0 ]; then
+      echo "Retrying upload (${RETRIES} retries left)..."
+      sleep 2
+    else
+      echo "Failed to upload chunk ${OFFSET}-${CHUNK_END} after multiple attempts: ${RESPONSE}"
+      exit 1
+    fi
+  done
 
   OFFSET=$((CHUNK_END + 1))
 done
