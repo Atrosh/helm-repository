@@ -5,7 +5,7 @@ enabled: true
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
-
+revisionHistoryLimit: 3
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
   # This sets the pull policy for images.
@@ -59,6 +59,7 @@ service:
   additionalPorts: []
 #    - name: jbrnr
 #      containerPort: 8090
+#      port: 8090
 #      protocol: TCP
 
 envs:
@@ -69,6 +70,7 @@ envSecrets: {}
 #    key: password
 
 pg-dump-job:
+  nameOverride: db-backup
   enabled: false
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
@@ -113,7 +115,10 @@ readinessProbe:
     port: 8080
   initialDelaySeconds: 5
   periodSeconds: 10
-
+lifecycle:
+  preStop:
+    exec:
+      command: ["sh", "-c", "sleep 10"]
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
   enabled: false

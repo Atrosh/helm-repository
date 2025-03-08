@@ -8,6 +8,7 @@ metadata:
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
   {{- end }}
   selector:
     matchLabels:
@@ -47,7 +48,7 @@ spec:
               protocol: TCP
             {{- range .Values.service.additionalPorts }}
             - name: {{ .name }}
-              containerPort: {{ .port }}
+              containerPort: {{ default .containerPort .port }}
               protocol: {{ .protocol | default "TCP" }}
             {{- end }}
           {{- with .Values.livenessProbe }}
@@ -56,6 +57,10 @@ spec:
           {{- end }}
           {{- with .Values.readinessProbe }}
           readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.lifecycle }}
+          lifecycle:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.resources }}
