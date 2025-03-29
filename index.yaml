@@ -154,6 +154,20 @@ entries:
   spring-app:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2025-03-29T00:02:24.33619944Z"
+    dependencies:
+    - name: pg-dump-job
+      repository: https://raw.githubusercontent.com/Atrosh/helm-repository/gh-pages
+      version: 0.2.7
+    description: A Helm chart for Kubernetes
+    digest: a39e8129fc194e70be09d0a1964dfe23a6eabdaf315f918f772d4616f0b3b720
+    name: spring-app
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/Atrosh/helm-repository/gh-pages/helm/spring-app-0.3.8.tgz
+    version: 0.3.8
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2025-03-08T19:30:22.58321903Z"
     dependencies:
     - name: pg-dump-job
@@ -286,4 +300,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/Atrosh/helm-repository/gh-pages/helm/spring-app-0.1.0.tgz
     version: 0.1.0
-generated: "2025-03-08T21:36:50.068578736Z"
+generated: "2025-03-29T00:02:24.335238231Z"
