@@ -1,48 +1,54 @@
 enabled: true
-image: "bitnami/postgresql"
-
-schedule: "0 0 * * *"
-
-sizeLimit: ""
+nameOverride: "dump-postgres"
+dumpImage: "bitnami/postgresql"
+uploadClientImage: "bitnami/minio-client"
 backupDirectory: "/backup"
-
-db:
-  host: ""
-  name: "postgres"
-  user: "postgres"
-  password: {}
-#  password:
-#    valueFrom:
-#      secretKeyRef:
-#        name: postgres
-#        key: password
-upload:
-  s3:
-    enabled: true
-    image: "bitnami/minio-client"
-    url: ""
-    bucket: "db-backups"
-    accessKey: {}
-    secretKey: {}
-    targetLocation: ""
-    # With "1 5 7" value backup will run Mon, Fri, Sun
-    backupDays: ""
-
-  sharepoint:
-    enabled: false
-    image: ""
-    tenantId: ""
-    driveId: ""
-    clientId: {}
-    clientSecret: {}
-    targetLocation: ""
-    backupDays: ""
-
-imagePullSecrets:
-  - name: regcred
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
+jobs: []
+#  primary:
+#    image: "bitnami/postgresql"
+#
+#    schedule: "0 0 * * *"
+#
+#    sizeLimit: ""
+#    backupDirectory: "/backup"
+#
+#    db:
+#      host: ""
+#      name: "postgres"
+#      user: "postgres"
+#      password: { }
+#    #  password:
+#    #    valueFrom:
+#    #      secretKeyRef:
+#    #        name: postgres
+#    #        key: password
+#    upload:
+#      s3:
+#        enabled: true
+#        image: "bitnami/minio-client"
+#        url: ""
+#        bucket: "db-backups"
+#        accessKey: { }
+#        secretKey: { }
+#        targetLocation: ""
+#        # With "1 5 7" value backup will run Mon, Fri, Sun
+#        backupDays: ""
+#
+#      sharepoint:
+#        enabled: false
+#        image: ""
+#        tenantId: ""
+#        driveId: ""
+#        clientId: { }
+#        clientSecret: { }
+#        targetLocation: ""
+#        backupDays: ""
+#
+#    imagePullSecrets:
+#      - name: regcred
+#
+#    nodeSelector: { }
+#
+#    tolerations: [ ]
+#
+#    affinity: { }

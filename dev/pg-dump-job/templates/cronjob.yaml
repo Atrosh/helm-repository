@@ -1,12 +1,15 @@
 {{- if .Values.enabled }}
+{{- range $name, $value := .Values.jobs }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ include "pg-dump-job.fullname" $ }}-cron
+  name: {{ include "pg-dump-job.fullname" $ }}-{{ $name }}-cron-job
   labels:
     {{- include "pg-dump-job.labels" $ | nindent 4 }}
 spec:
-  schedule: {{ .Values.schedule | quote}}
+{{- $backupDirectory := $value.backupDirectory | default $.Values.backupDirectory -}}
+{{- with $value }}
+  schedule: {{ .schedule | quote}}
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -17,41 +20,41 @@ spec:
           volumes:
             - name: backup
               emptyDir:
-                sizeLimit: {{ .Values.sizeLimit | default "10Gi" }}
-          {{- with .Values.imagePullSecrets }}
+                sizeLimit: {{ .sizeLimit | default "10Gi" }}
+          {{- with .imagePullSecrets }}
           imagePullSecrets:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.nodeSelector }}
+          {{- with .nodeSelector }}
           nodeSelector:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.affinity }}
+          {{- with .affinity }}
           affinity:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.tolerations }}
+          {{- with .tolerations }}
           tolerations:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           initContainers:
             - name: backup-runner
-              image: {{ .Values.image }}
+              image: {{ .image | default $.Values.dumpImage }}
               imagePullPolicy: IfNotPresent
               volumeMounts:
                 - name: backup
-                  mountPath: {{ .Values.backupDirectory }}
+                  mountPath: {{ $backupDirectory }}
               env:
                 - name: BACKUP_DIR
-                  value: {{ .Values.backupDirectory }}
+                  value: {{ $backupDirectory }}
                 - name: DB_NAME
-                  value: {{ .Values.db.name }}
+                  value: {{ .db.name }}
                 - name: DB_USER
-                  value: {{ .Values.db.user }}
+                  value: {{ .db.user }}
                 - name: DB_HOST
-                  value: {{ .Values.db.host }}
+                  value: {{ .db.host }}
                 - name: PGPASSWORD
-                {{- with .Values.db.password }}
+                {{- with .db.password }}
                   {{- toYaml . | nindent 18 }}
                 {{- end }}
               command:
@@ -60,28 +63,28 @@ spec:
               args:
                 - |
               {{- include "backup.script" . | indent 18 }}
-            {{- if .Values.upload.s3.enabled }}
+            {{- if .upload.s3.enabled }}
             - name: s3-uploader
-              image: {{ .Values.upload.s3.image }}
+              image: {{ .upload.s3.image | default $.Values.uploadClientImage }}
               imagePullPolicy: IfNotPresent
               volumeMounts:
                 - name: backup
-                  mountPath: {{ .Values.backupDirectory }}
+                  mountPath: {{ $backupDirectory }}
               env:
                 - name: BACKUP_DIR
-                  value: {{ .Values.backupDirectory }}
+                  value: {{ $backupDirectory }}
                 - name: MINIO_URL
-                  value: {{ .Values.upload.s3.url }}
+                  value: {{ .upload.s3.url }}
                 - name: MINIO_BUCKET
-                  value: {{ .Values.upload.s3.bucket }}
+                  value: {{ .upload.s3.bucket }}
                 - name: TARGET_LOCATION
-                  value: {{ trimSuffix "/" .Values.upload.s3.targetLocation }}
+                  value: {{ trimSuffix "/" .upload.s3.targetLocation }}
                 - name: MINIO_ACCESS_KEY
-                {{- with .Values.upload.s3.accessKey }}
+                {{- with .upload.s3.accessKey }}
                   {{- toYaml . | nindent 18 }}
                 {{- end }}
                 - name: MINIO_SECRET_KEY
-                {{- with .Values.upload.s3.secretKey }}
+                {{- with .upload.s3.secretKey }}
                   {{- toYaml . | nindent 18 }}
                 {{- end }}
               command:
@@ -89,31 +92,31 @@ spec:
                 - -c
               args:
                 - |
-              {{- include "backup.upload.skip" .Values.upload.s3 | indent 18 }}
+              {{- include "backup.upload.skip" .upload.s3 | indent 18 }}
               {{- include "backup.upload.s3" . | indent 18 }}
             {{- end }}
-            {{- if .Values.upload.sharepoint.enabled }}
+            {{- if .upload.sharepoint.enabled }}
             - name: sharepoint-uploader
-              image: {{ .Values.upload.sharepoint.image }}
+              image: {{ .upload.sharepoint.image }}
               imagePullPolicy: IfNotPresent
               volumeMounts:
                 - name: backup
-                  mountPath: {{ .Values.backupDirectory }}
+                  mountPath: {{ $backupDirectory }}
               env:
                 - name: BACKUP_DIR
-                  value: {{ .Values.backupDirectory }}
+                  value: {{ $backupDirectory }}
                 - name: MS_TENANT_ID
-                  value: {{ .Values.upload.sharepoint.tenantId }}
+                  value: {{ .upload.sharepoint.tenantId }}
                 - name: SHAREPOINT_DRIVE_ID
-                  value: {{ .Values.upload.sharepoint.driveId }}
+                  value: {{ .upload.sharepoint.driveId }}
                 - name: SHAREPOINT_FOLDER_PATH
-                  value: {{ .Values.upload.sharepoint.targetLocation }}
+                  value: {{ .upload.sharepoint.targetLocation }}
                 - name: MS_CLIENT_ID
-                {{- with .Values.upload.sharepoint.clientId }}
+                {{- with .upload.sharepoint.clientId }}
                   {{- toYaml . | nindent 18 }}
                 {{- end }}
                 - name: MS_CLIENT_SECRET
-                {{- with .Values.upload.sharepoint.clientSecret }}
+                {{- with .upload.sharepoint.clientSecret }}
                   {{- toYaml . | nindent 18 }}
                 {{- end }}
               command:
@@ -121,26 +124,28 @@ spec:
                 - -c
               args:
                 - |
-              {{- include "backup.upload.skip" .Values.upload.sharepoint | indent 18 }}
+              {{- include "backup.upload.skip" .upload.sharepoint | indent 18 }}
               {{- include "backup.upload.sharepoint" . | indent 18 }}
             {{- end }}
           containers:
             - name: backup-finalizer
-              image: {{ .Values.image }}
+              image: {{ .image }}
               imagePullPolicy: IfNotPresent
               volumeMounts:
                 - name: backup
-                  mountPath: {{ .Values.backupDirectory }}
+                  mountPath: {{ $backupDirectory }}
               command:
                 - /bin/bash
                 - -c
               env:
                 - name: BACKUP_DIR
-                  value: {{ .Values.backupDirectory }}
+                  value: {{ $backupDirectory }}
               args:
                 - |
                   cd ${BACKUP_DIR}
                   BACKUP_FILE=$(ls -tp | grep -v / | head -n 1)
                   rm -f "${BACKUP_FILE}"
                   echo "Backup and upload completed successfully!"
+{{- end }}
+{{- end }}
 {{- end }}
