@@ -63,9 +63,10 @@ spec:
               args:
                 - |
               {{- include "backup.script" . | indent 18 }}
-            {{- if .upload.s3.enabled }}
-            - name: s3-uploader
-              image: {{ .upload.s3.image | default $.Values.uploadClientImage }}
+            {{- range $uploadName, $upload := .upload }}
+            {{- if and $upload.enabled (eq $upload.type "s3" ) }}
+            - name: s3-{{ $uploadName }}-uploader
+              image: {{ $upload.image | default $.Values.uploadClientImage }}
               imagePullPolicy: IfNotPresent
               volumeMounts:
                 - name: backup
@@ -74,17 +75,17 @@ spec:
                 - name: BACKUP_DIR
                   value: {{ $backupDirectory }}
                 - name: MINIO_URL
-                  value: {{ .upload.s3.url }}
+                  value: {{ $upload.url }}
                 - name: MINIO_BUCKET
-                  value: {{ .upload.s3.bucket }}
+                  value: {{ $upload.bucket }}
                 - name: TARGET_LOCATION
-                  value: {{ trimSuffix "/" .upload.s3.targetLocation }}
+                  value: {{ trimSuffix "/" $upload.targetLocation }}
                 - name: MINIO_ACCESS_KEY
-                {{- with .upload.s3.accessKey }}
+                {{- with $upload.accessKey }}
                   {{- toYaml . | nindent 18 }}
                 {{- end }}
                 - name: MINIO_SECRET_KEY
-                {{- with .upload.s3.secretKey }}
+                {{- with $upload.secretKey }}
                   {{- toYaml . | nindent 18 }}
                 {{- end }}
               command:
@@ -92,12 +93,12 @@ spec:
                 - -c
               args:
                 - |
-              {{- include "backup.upload.skip" .upload.s3 | indent 18 }}
+              {{- include "backup.upload.skip" $upload | indent 18 }}
               {{- include "backup.upload.s3" . | indent 18 }}
             {{- end }}
-            {{- if .upload.sharepoint.enabled }}
-            - name: sharepoint-uploader
-              image: {{ .upload.sharepoint.image }}
+            {{- if and $upload.enabled (eq $upload.type "sharepoint" ) }}
+            - name: sharepoint-{{ $uploadName }}-uploader
+              image: {{ $upload.image }}
               imagePullPolicy: IfNotPresent
               volumeMounts:
                 - name: backup
@@ -106,17 +107,17 @@ spec:
                 - name: BACKUP_DIR
                   value: {{ $backupDirectory }}
                 - name: MS_TENANT_ID
-                  value: {{ .upload.sharepoint.tenantId }}
+                  value: {{ $upload.tenantId }}
                 - name: SHAREPOINT_DRIVE_ID
-                  value: {{ .upload.sharepoint.driveId }}
+                  value: {{ $upload.driveId }}
                 - name: SHAREPOINT_FOLDER_PATH
-                  value: {{ .upload.sharepoint.targetLocation }}
+                  value: {{ $upload.targetLocation }}
                 - name: MS_CLIENT_ID
-                {{- with .upload.sharepoint.clientId }}
+                {{- with $upload.clientId }}
                   {{- toYaml . | nindent 18 }}
                 {{- end }}
                 - name: MS_CLIENT_SECRET
-                {{- with .upload.sharepoint.clientSecret }}
+                {{- with $upload.clientSecret }}
                   {{- toYaml . | nindent 18 }}
                 {{- end }}
               command:
@@ -124,8 +125,9 @@ spec:
                 - -c
               args:
                 - |
-              {{- include "backup.upload.skip" .upload.sharepoint | indent 18 }}
+              {{- include "backup.upload.skip" $upload | indent 18 }}
               {{- include "backup.upload.sharepoint" . | indent 18 }}
+            {{- end }}
             {{- end }}
           containers:
             - name: backup-finalizer

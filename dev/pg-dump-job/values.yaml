@@ -23,7 +23,8 @@ jobs: []
 #    #        name: postgres
 #    #        key: password
 #    upload:
-#      s3:
+#      hz-prd:
+#        type: s3
 #        enabled: true
 #        image: "bitnami/minio-client"
 #        url: ""
@@ -34,8 +35,9 @@ jobs: []
 #        # With "1 5 7" value backup will run Mon, Fri, Sun
 #        backupDays: ""
 #
-#      sharepoint:
-#        enabled: false
+#      sp-prd:
+#        type: sharepoint
+#        enabled: true
 #        image: ""
 #        tenantId: ""
 #        driveId: ""
