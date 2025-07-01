@@ -3,6 +3,16 @@ entries:
   frontend-app:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2025-07-01T14:51:22.754753709Z"
+    description: A Helm chart for SPA
+    digest: e82237f9b26e2efaaa5910b2702c8e85a82cc7e3d923396685c8e8c5fdfe27d9
+    name: frontend-app
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/Atrosh/helm-repository/gh-pages/helm/frontend-app-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2025-03-08T21:36:50.069001245Z"
     description: A Helm chart for SPA
     digest: 319e9560ec44264013bc125c2f62271d1087090181c07c0d9f6c2405fd02252f
@@ -310,4 +320,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/Atrosh/helm-repository/gh-pages/helm/spring-app-0.1.0.tgz
     version: 0.1.0
-generated: "2025-05-28T18:58:12.155202203Z"
+generated: "2025-07-01T14:51:22.75430242Z"
