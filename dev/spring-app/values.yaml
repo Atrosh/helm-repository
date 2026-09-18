@@ -89,6 +89,22 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+httproutes:
+  enabled: false
+  gateway:
+    name: {}
+    namespace: {}
+  paths: []
+#  paths:
+#    - path: "/api"
+  filters: []
+#  filters:
+#    - type: URLRewrite
+#      urlRewrite:
+#        path:
+#          type: ReplacePrefixMatch
+#          replacePrefixMatch: /api/v1
+  timeout: "0s"
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
