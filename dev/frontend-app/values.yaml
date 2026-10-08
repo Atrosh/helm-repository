@@ -16,9 +16,31 @@ service:
   port: 8080
 
 ingress:
-  enabled: true
+  enabled: false
   className: nginx
   annotations: {}
+
+httproutes:
+  enabled: false
+  annotations: {}
+  gateway:
+    name: {}
+    namespace: {}
+  paths: []
+  #  paths:
+  #    - path: "/api"
+  filters: []
+  #  filters:
+  #    - type: URLRewrite
+  #      urlRewrite:
+  #        path:
+  #          type: ReplacePrefixMatch
+  #          replacePrefixMatch: /api/v1
+  timeout: "0s"
+
+envs: {}
+envSecrets: {}
+
 resources:
    limits:
      cpu: 200m
